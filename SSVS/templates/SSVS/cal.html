@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="{% static 'SSVS/css/materialize.min.css' %}"/>
+  <link rel="stylesheet" href="{% static 'SSVS/css/fullcalendar.min.css' %}"/>
+  <link rel="stylesheet" href="{% static 'SSVS/css/iziModal.min.css' %}"/>
+  <script src="{% static 'SSVS/lib/jquery.min.js' %}"></script>
+  <script src="{% static 'SSVS/lib/moment.min.js' %}"></script>
+  <script src="{% static 'SSVS/js/fullcalendar.min.js' %}"></script>
+  <script src="{% static 'SSVS/locale/ja.js' %}"></script>
+  <script src="{% static 'SSVS/js/iziModal.min.js' %}"></script>
+  <script src="{% static 'SSVS/js/materialize.min.js' %}"></script>
+  <style>
+  #external-events h4 {
+    font-size: 16px;
+    margin-top: 0;
+    padding-top: 1em;
+  }
+
+  #external-events .fc-event {
+    margin: 10px 0;
+    cursor: pointer;
+  }
+
+  #external-events p {
+    margin: 1.5em 0;
+    font-size: 11px;
+    color: #666;
+  }
+
+  #external-events p input {
+    margin: 0;
+    vertical-align: middle;
+  }
+
+  </style>
+</head>
+<body>
+  <div class="row">
+    <div class="col m3">
+      <h4>スケジュール管理画面</h4>
+    </div>
+    <div class="col m9" id='calendar'></div>
+  </div>
+  <div id='modal_schedule'>
+  </div>
+  <div id='modal_event'>
+  </div>
+
+  <script>
+  function createModal($, id, modal) {
+    var $modal = $(id);
+    $modal = modal.buildView($, $modal);
+    $modal.iziModal();
+  }
+
+  function ModalView(cal) {
+    var proto = ModalView.prototype;
+    var func = cal;
+    proto.buildView = function ($, $modal) {
+      return func($, $modal);
+    }
+  }
+
+  function ScheduleModal() {
+    ModalView.call(this, function($, $modal) {
+      $modal.empty();
+      var $div = $("<div></div>");
+      var $input = $("<input />");
+      var $textarea = $("<textarea></textarea>");
+      var $button = $("<button></button>");
+
+      $div.text("title");
+      $input.attr("type", "text");
+      $input.attr("name", "s_title");
+      $div = $div.add($input);
+      $modal.append($div);
+
+      $div = $("<div></div>");
+      $div.text("content");
+      $textarea.attr("name", "s_content");
+      $div = $div.add($textarea);
+      $modal.append($div);
+
+      $button.attr("id", "m_schedule_sub");
+      $button.text("SEND");
+
+      $modal.append($button);
+
+      return $modal;
+    });
+
+    //ScheduleModal.prototype = new ModalView(func);
+  }
+  function EventModal(event) {
+    ModalView.call(this, function($, $modal) {
+      $modal.empty();
+      var $idBox = $("<div></div>")
+      var $titleBox = $("<div></div>");
+      var $contentBox = $("<div></div>");
+      var $schoolBox = $("<div></div>");
+      var $startBox = $("<div></div>");
+      var $endBox = $("<div></div>");
+
+      $idBox.text("id   :" + event.id);
+      $titleBox.text("title   :  " + event.title);
+      $contentBox.text("content : " + event.content);
+      $schoolBox.text("school  : " + event.school);
+      $startBox.text("start   :" + event.start.toISOString());
+      $endBox.text("end     :" + event.end.toISOString());
+
+      $modal.append($idBox);
+      $modal.append($titleBox);
+      $modal.append($contentBox);
+      $modal.append($schoolBox);
+      $modal.append($startBox);
+      $modal.append($endBox);
+      return $modal;
+    });
+  }
+  ScheduleModal.prototype = new ModalView();
+  EventModal.prototype = new ModalView();
+
+  </script>
+  <script>
+
+  $(document).ready(function() {
+
+    var eventObj = {
+      start: null,
+      end: null,
+      date: null,
+      title: "",
+      content: "",
+      school: "",
+    };
+
+    // page is now ready, initialize the calendar...
+    $('#calendar').fullCalendar({
+      locale: 'ja',
+      timezone: 'Asia/Tokyo',
+      navLinks: true,
+      views: {
+        month: { // name of view
+          titleFormat: 'YYYY年MM月'
+        },
+        week: {
+          titleFormat: 'MM月DD日',
+          slotLabelFormat: 'H:mm'
+        },
+        day: {
+          titleFormat: 'MM月DD日',
+          slotLabelFormat: 'H:mm'
+        }
+      },
+      header: {
+        left: '',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      footer: {
+        left: 'prev',
+        center: 'today',
+        right: 'next'
+      },
+      weekNumbers: true,
+      weekNumbersWithinDays:true,
+      slotEventOverlap: false,
+      dayClick: function(date, jsEvent, view) {
+        window.location.href = "/SSVS/day/"+ date.format("YYYY/MM/DD");
+      },
+      // selectable: false,
+      // select: function(start, end) {
+      //   eventObj["start"] = start;
+      //   eventObj["end"] = end;
+      //   $('#modal_schedule').iziModal('open');
+      // },
+      eventLimit: true, // allow "more" link when too many events
+      eventClick: function(event) {
+          //createModal($, "#modal_event", new EventModal(event));
+          //$('#modal_event').iziModal('open');
+          // var m_s = moment(event.start);
+          // var m_e = moment(event.end);
+        //  alert(event.date);
+        //  alert(m_s.format('YYYY年MM月DD日(dddd) HH:mm:ss ~ ') + m_e.format("HH:mm:ss"));
+        //  window.location.href = "/SSVS/schedule";
+          // var date = moment(event.date).format("YYYY/MM/DD");
+          // window.location.href = "/SSVS/schedule/" + date;
+      },
+      events: "./schedule.json"
+
+    });
+
+    createModal($, "#modal_schedule", new ScheduleModal());
+
+    $("#m_schedule_sub").on("click", function(e) {
+      eventObj.title = $("input[name=s_title]").val();
+      eventObj.content =  $("textarea[name=s_content]").val();
+      var eventData;
+      if (eventObj.title) {
+        eventData = eventObj;
+        $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+      }
+      $('#calendar').fullCalendar('unselect');
+      $('#modal_schedule').iziModal('close');
+      $("input[name=s_title]").val("");
+      $("textarea[name=s_content]").val("");
+    });
+
+  });
+  </script>
+</body>
+</html>

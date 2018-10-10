@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- <link rel="stylesheet" href="{% static 'SSVS/css/materialize.min.css' %}"/> -->
+  <link rel="stylesheet" href="{% static 'SSVS/css/bootstrap.min.css' %}"/>
+  <link rel="stylesheet" href="{% static 'SSVS/css/flatpickr.css' %}"/>
+  <script src="{% static 'SSVS/lib/jquery.min.js' %}"></script>
+  <!-- <script src="{% static 'SSVS/lib/jquery-ui.min.js' %}"></script> -->
+  <!-- <script src="{% static 'SSVS/js/materialize.min.js' %}"></script> -->
+  <!-- <script src="{% static 'SSVS/js/jquery.formset.js' %}"></script> -->
+  <script src="{% static 'SSVS/js/bootstrap.min.js' %}"></script>
+  <!-- <script src="{% static 'SSVS/js/flatpickr.js' %}"></script> -->
+  <!-- <script src="{% static 'SSVS/lib/l10n/ja.js' %}"></script> -->
+</head>
+<body>
+
+  <h1>{{date}}</h1>
+  <p>スケジュールを追加してください</p>
+  <form id="multi" action="{{ action_path }}" method="{{ method_type }}">
+    {% csrf_token %}
+    {% for form in formset %}
+    <div class="item">
+      {{ form }}
+    </div>
+    {% endfor %}
+    <button class="btn btn-danger remove-form-row">
+      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+    </button>
+    <button class="btn btn-success add-form-row">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+     {{ formset.management_form }}
+    <div>
+      <input type="submit" value="submit"/>
+    </div>
+  </form>
+
+  <script type="text/javascript">
+
+  $(document).ready(function() {
+    $('#id_' + "form" + '-TOTAL_FORMS').val(1);
+  });
+
+  function updateElementIndex(el, prefix, ndx) {
+    var id_regex = new RegExp('(' + prefix + '-\\d+)');
+    var replacement = prefix + '-' + ndx;
+    if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+    if (el.id) el.id = el.id.replace(id_regex, replacement);
+    if (el.name) el.name = el.name.replace(id_regex, replacement);
+  }
+
+  function cloneMore(selector, prefix) {
+    var newElement = $(selector).clone(true);
+    var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+    newElement.find(':input').each(function() {
+        var name = $(this).attr('name').replace('-' + (total-1) + '-', '-' + total + '-');
+        var id = 'id_' + name;
+        $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+    });
+    total++;
+    $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+    $(selector).after(newElement);
+    var conditionRow = $('.item:not(:last)');
+    conditionRow.find('.btn.add-form-row')
+    .removeClass('btn-success').addClass('btn-danger')
+    .removeClass('add-form-row').addClass('remove-form-row')
+    .html('<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>');
+    return false;
+  }
+
+  function deleteForm(prefix, btn) {
+    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+    if (total > 1){
+      if($('.item').length > 1) {
+        $(".item:last").remove();
+        var forms = $('.item');
+        $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
+        for (var i=0; i<forms.length; i++) {
+            $(forms.get(i)).find(':input').each(function() {
+                updateElementIndex(this, prefix, i);
+            });
+        }
+      }
+    }
+    return false;
+  }
+
+  $(document).on('click', '.add-form-row', function(e){
+    e.preventDefault();
+    cloneMore('.item:last', 'form');
+    return false;
+  });
+
+  $(document).on('click', '.remove-form-row', function(e){
+    e.preventDefault();
+    deleteForm('form', $(this));
+    return false;
+  });
+  </script>
+</body>
+</html>

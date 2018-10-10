@@ -1,0 +1,9 @@
+{% if teacher_list %}
+    <ul>
+    {% for teacher in teacher_list %}
+        <li>{{ teacher.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--Import Google Icon Font-->
+     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'SSVS/css/materialize.min.css' %}"/>
+  <script src="{% static 'SSVS/lib/jquery.min.js' %}"></script>
+  <script src="{% static 'SSVS/js/materialize.min.js' %}" media="screen,projection"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+  <div class="">
+    <h2>{{ date }}の日程</h2>
+    <div class="left">
+      <a class="waves-effect waves-light btn" href="{{ prev }}">1日前</a>
+    </div>
+    <div class="right">
+      <a class="waves-effect waves-light btn" href="{{ next }}">1日後</a>
+    </div>
+
+        <ul class="tabs">
+          {% for item in group %}
+          <li class="tab"><a href="#{{ item.value }}">{{item.lesson}}</a></li>
+          {% endfor %}
+        </ul>
+      <div class="container">
+      {% for item in group %}
+      <div id="{{ item.value }}">
+        <table class="bordered" >
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>校舎</th>
+              <!-- <th>授業名</th> -->
+              <th>講師</th>
+              <th>生徒</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for schedule in item.schedule_list %}
+            <tr>
+              <td>{{ schedule.time }}</td>
+              <td>{{ schedule.school }}</td>
+              <!-- <td>{{ schedule.lesson }}</td> -->
+              <td>{{ schedule.teacher }}</td>
+              <td>{{ schedule.student }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="fixed-action-btn">
+    <a class="btn-floating btn-large red pulse" href="{% url 'SSVS:scheduleForm' year month day %}">
+      <i class="large material-icons">mode_edit</i>
+    </a>
+  </div>
+    </div>
+  <script>
+    $(document).ready(function(){
+      $('ul.tabs').tabs();
+      $('.fixed-action-btn').openFAB();
+    });
+  </script>
+</body>
+</html>

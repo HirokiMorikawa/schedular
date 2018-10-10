@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'SSVS/css/materialize.min.css' %}"/>
+  <script src="{% static 'SSVS/lib/jquery.min.js' %}"></script>
+  <script src="{% static 'SSVS/js/materialize.min.js' %}"></script>
+</head>
+<body>
+  <h1>{{ date }}の日程</h1>
+  <table class="bordered" >
+        <thead>
+          <tr>
+              <th>時間</th>
+              <th>校舎</th>
+              <th>授業名</th>
+              <th>講師</th>
+              <th>生徒</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% if schedule_list %}
+          {% for schedule in schedule_list %}
+          <tr>
+            <td>{{ schedule.time }}</td>
+            <td>{{ schedule.school }}</td>
+            <td>{{ schedule.lesson }}</td>
+            <td>{{ schedule.teacher }}</td>
+            <td>{{ schedule.student }}</td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--Import Google Icon Font-->
+     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'SSVS/css/materialize.min.css' %}"/>
+  <script src="{% static 'SSVS/lib/jquery.min.js' %}"></script>
+  <script src="{% static 'SSVS/js/materialize.min.js' %}" media="screen,projection"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+  <div class="content">
+    <a class="waves-effect waves-light btn" href="{{ now }}">現在</a>
+    <div class="row">
+      <div class="col m4 s12 hide-on-small-only">
+        <div class="collection">
+          {% for day in week_list %}
+          <a id="{{day.id}}" class="center-align collection-item opener">
+            {{day.month}}月{{day.day}}日（{{day.dayOfWeek}}）
+            {% if day.numOfSchedule != 0 %}
+              <span class="new badge">{{day.numOfSchedule}}</span>
+            {% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col m8 s12">
+        <ul class="collapsible popout content" data-collapsible="accordion">
+          {% for day in week_list %}
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons">whatshot</i>{{day.month}}月{{day.day}}日（{{day.dayOfWeek}}）
+            </div>
+            <div class="collapsible-body">
+              {% if day.schedules %}
+              <table class="responsive-table striped">
+                <thead>
+                  <th>時間</th>
+                  <th>授業</th>
+                  <th>講師</th>
+                  <th>校舎</th>
+                  <th>生徒</th>
+                </thead>
+                <tbody>
+                  {% for schedule in day.schedules %}
+                  <tr>
+                    <td>{{schedule.time}}</td>
+                    <td>{{schedule.lesson}}</td>
+                    <td>{{schedule.teacher}}</td>
+                    <td>{{schedule.school}}</td>
+                    <td>{{schedule.student}}</td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+              <a class="waves-effect waves-light btn-large" href="{% url 'SSVS:dayOfSchedule' day.year day.month day.day %}">
+                <i class="material-icons right">cloud</i>詳細
+              </a>
+              <a class="waves-effect waves-light btn red" href="{% url 'SSVS:scheduleForm' day.year day.month day.day %}">
+                <i class="material-icons right">mode_edit</i>この日のスケジュールを追加
+              </a>
+              {% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="left">
+      <a class="waves-effect waves-light btn" href="{{ prev }}">1週間前</a>
+    </div>
+    <div class="right">
+      <a class="waves-effect waves-light btn" href="{{ next }}">1週間後</a>
+    </div>
+  </div>
+  <script>
+
+  $(document).ready(function(){
+    $('.collapsible').collapsible();
+    {% for day in week_list %}
+    $("#{{day.id}}").on("click", function(e){
+        $(".collapsible").collapsible('open', {{day.week_count}});
+    })
+    {% endfor %}
+  });
+
+  </script>
+</body>

@@ -1,0 +1,6 @@
+/.idea
+/blog
+/cms
+/django_calendar
+__pycache__/
+node_modules/
